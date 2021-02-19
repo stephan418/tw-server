@@ -32,9 +32,6 @@ const io: socketio.Server = require("socket.io")(http, { cors: { origin: true, m
 
 // Route for delivering the Website itself
 // TODO: Move into its own microservice
-app.get("/", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "index.html"));
-});
 
 io.on("connection", async (socket: socketio.Socket) => {
   let username: string | undefined = undefined;
