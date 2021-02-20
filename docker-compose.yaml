@@ -1,0 +1,11 @@
+version: '3'
+services:
+  tw-server:
+    image: tw-server:1.0 
+    ports:
+      - 3000:3000
+    environment: 
+      - MONGO_HOST=mongodb
+    
+  mongodb:
+    image: mongo

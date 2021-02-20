@@ -9,4 +9,4 @@ COPY . /home/app
 WORKDIR /home/app
 RUN npm i
 
-CMD ["ts-node", "/home/app/app/app.ts"]
+CMD ["npm", "run", "start"]
