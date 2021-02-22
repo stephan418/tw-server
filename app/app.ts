@@ -64,6 +64,14 @@ io.on("connection", async (socket: socketio.Socket) => {
       socket.emit("activated", { username: prejoin_doc.username });
       socket.emit("users", { usernames: room_doc.users.map((user: { username: string }) => user.username) });
 
+      let wordLists = [{name: "default", commonName: `Default (${words.default?._commonName})`}];
+
+      for (let n of words.listNames) {
+        wordLists.push({name: n, commonName: words.get(n)?._commonName || ''});
+      }
+
+      socket.emit("word-lists", { lists: wordLists });
+
       username = prejoin_doc.username;
       game_id = prejoin_doc.game_id;
 
