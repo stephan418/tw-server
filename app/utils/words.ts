@@ -1,3 +1,5 @@
+import fs from 'fs';
+
 class WordList {
     private words: string[];
 
@@ -25,7 +27,7 @@ export class WordLists {
     private _defaultList: string
 
     constructor(path: string) {
-        const json = JSON.parse(path);
+        const json = JSON.parse(fs.readFileSync(path, 'utf8'));
         
         this._lists = {};
         this._defaultList = json.default;
