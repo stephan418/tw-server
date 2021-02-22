@@ -154,10 +154,11 @@ io.on("connection", async (socket: socketio.Socket) => {
       if (typed >= room_doc.text_size) {
         typed = room_doc.text_size;
 
-        const position = await rooms.find({ game_id, users: { $elemMatch: { finished: true } } }).toArray();
-        console.log(username, position);
+        const positionResult = await rooms.aggregate([{ $match: { game_id } }, { $unwind: "$users" }, { $match: { "users.finished": true } }, { $count: "count" }]).toArray();
 
-        io.to(game_id).emit("finished-typing", { username: username, position: 1 });
+        const position = positionResult.length > 0 ? positionResult[0].count + 1 : 1;
+
+        io.to(game_id).emit("finished-typing", { username: username, position });
 
         rooms.updateOne({ game_id, users: { $elemMatch: { username } } }, { $set: { "users.$.finished": true } });
       }
