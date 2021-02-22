@@ -79,7 +79,7 @@ io.on("connection", async (socket: socketio.Socket) => {
     }
   });
 
-  socket.on("start", async () => {
+  socket.on("start", async (args: { listName?: string }) => {
     if (!game_id || !username) {
       socket.emit("error", SError.protocolNotFollowed("start", "activate").response);
       return;
@@ -102,7 +102,12 @@ io.on("connection", async (socket: socketio.Socket) => {
     } else {
       db.collection("rooms").updateOne({ game_id }, { $set: { phase: 1 } });
 
-      let room_words = words.default?.random(10);
+      let room_words;
+      if (args?.listName && args.listName !== 'default') {
+        room_words = words.get(args.listName)?.random(10);
+      } else {
+        room_words = words.default?.random(10);
+      }
 
       if (!room_words) {
         socket.emit("error", SError.argumentValueNotFound("word_list", "default"));
