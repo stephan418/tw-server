@@ -8,20 +8,9 @@ import { Db, MongoClient } from "mongodb";
 import { mongo_url } from "./utils/mongodb_config";
 import { SError } from "./errors/socket_errors";
 import cors from "cors";
+import { WordLists } from "./utils/words";
 
-const words = "ich,sie,das,ist,du,nicht,die,und,es,der,was,wir,er,zu,ein,in,mit,mir,den,wie,ja,auf,mich,so,eine,aber,hier,sind,für,von,haben,dich,hat,dass,war,wenn,an,nein,da,noch,bin,habe,nur,dir,sich,ihr,einen,uns,dem,hast,ihn,aus,kann,gut,im,schon,auch,sein,jetzt,meine,mal,dann,als,um,s,mein,bist,doch,wird,keine,lch,nach,alles,man,oder,nichts,wo,weiß,werden,will,mehr,warum,ihnen,etwas,bitte,bei,muss,hab,immer,los,mann,vor,oh,zum,sehr,sehen,sagen,wieder,alle,gehen,wer,also,ihm,können,machen,danke,geht,diese,denn,komm,einem,tun,euch,einer,nie,des,über,kein,soll,vielleicht,weg,wissen,deine,am,kommen,werde,leben,gibt,müssen,viel,kommt,ok,wirklich,frau,hatte,heute,würde,ihre,tut,zeit,dein,bis,willst,ganz,wollen,gott,einfach,nun,macht,zurück,weil,dieser,wurde,damit,kannst,sir,wäre,gesagt,seine,zwei,wollte,meinen,sicher,hallo,leid,morgen,weißt,waren,lassen,ab,na,zur,lass,sagte,liebe,leute,hey,tag,hätte,genau,vater,geld,lhr,raus,durch,könnte,wohl,schön,gesehen,glaube,mach,keinen,klar,mutter,dieses,her,nacht,okay,besser,ohne,Mutter,Vater,Schwester,Bruder,Kind,Tante,Onkel,Großmutter,Großvater,Cousine,Cousin,Freund,Freundin,Mann,Frau,Kollege,Kollegin,Partner,Partnerin,Haus,Bett,Tisch,Tür,Kissen,Fenster,Wand,Boden,Schlafzimmer,Küche,Wohnung,Keller,Auto,Flugzeug,Boot,Taxi,Schulbus,Stadt,Land,Berg,Ebenen,Wüste,Schule,Arbeit,Heimatland,Zahnarzt,Zahnärztin,Aktie,Börse,Huhn,Hendl,Brokkoli,Zwiebel,Gruke,Zucchini,Lasagne,Fish,Hamster,Hemd,Rock,Kleid,Stiefel,Kreditkarte,Stonks".split(
-  ","
-);
-
-function shuffle(array: string[], amount: number) {
-  let returns = [];
-
-  for (let i = 0; i < amount; i++) {
-    returns.push(words[Math.floor(Math.random() * words.length)]);
-  }
-
-  return returns;
-}
+const words = new WordLists("default-words.json");
 
 const app = express();
 
@@ -105,7 +94,12 @@ io.on("connection", async (socket: socketio.Socket) => {
     } else {
       db.collection("rooms").updateOne({ game_id }, { $set: { phase: 1 } });
 
-      let room_words = shuffle(words, 10);
+      let room_words = words.default?.random(10);
+
+      if (!room_words) {
+        socket.emit("error", SError.argumentValueNotFound("word_list", "default"));
+        return;
+      };
 
       io.to(game_id as string).emit("starting", { in: 5, words: room_words });
       setTimeout(async () => {
