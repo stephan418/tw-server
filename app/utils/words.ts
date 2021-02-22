@@ -1,17 +1,19 @@
 import fs from 'fs';
 
 class WordList {
-    private words: string[];
+    private _words: string[];
+    readonly _commonName: string;
 
-    constructor(words: string[]) {
-        this.words = words;
+    constructor(words: string[], commonName: string) {
+        this._words = words;
+        this._commonName = commonName;
     };
 
     random(n: number) {
         let returns = [];
 
         for (let i = 0; i < n; i++) {
-            returns.push(this.words[Math.floor(Math.random() * this.words.length)]);
+            returns.push(this._words[Math.floor(Math.random() * this._words.length)]);
         }
 
         return returns;
@@ -32,8 +34,8 @@ export class WordLists {
         this._lists = {};
         this._defaultList = json.default;
         
-        Object.entries(json.lists).map(([name, list]) => {
-            this._lists = {...this._lists, [name]: new WordList(list as string[])};
+        Object.entries(json.lists).map(([name, list]: [name: string, list: any]) => {
+            this._lists = {...this._lists, [name]: new WordList(list.words as string[], list['common-name'])};
         });
     }
 
