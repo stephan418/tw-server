@@ -3,7 +3,7 @@ services:
   tw-server:
     image: ghcr.io/stephan418/tw-server/tw-server:latest
     ports:
-      - 3000:3000
+      - 3042:3000
     environment: 
       - MONGO_HOST=mongodb
     
